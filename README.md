@@ -7,6 +7,7 @@ MVP de una sola tabla (`products`).
 | Base de datos | Supabase (PostgreSQL) | `backend/schema.sql` |
 | API | FastAPI en Render | `backend/` |
 | Frontend | React + Vite + Tailwind + React Three Fiber en Vercel | `frontend/` |
+| Agente IA | Gemini (Google AI Studio) con herramientas de solo lectura sobre la BD | `backend/agent.py` |
 | Notificaciones | Slack (Incoming Webhook al crear producto) | `backend/main.py` |
 
 ## Ejecutar en local
@@ -30,10 +31,11 @@ npm run dev   # http://localhost:5173
 
 - `GET  /api/v1/products` → 200 OK
 - `POST /api/v1/products` → 201 Created
+- `POST /api/v1/chat` → agente Gemini que consulta la BD (requiere `GEMINI_API_KEY`)
 
 ## Despliegue
 
 **Render (backend):** Root Directory `backend` · Build `pip install -r requirements.txt` ·
-Start `uvicorn main:app --host 0.0.0.0 --port $PORT` · Variables `DATABASE_URL`, `SLACK_WEBHOOK_URL`.
+Start `uvicorn main:app --host 0.0.0.0 --port $PORT` · Variables `DATABASE_URL`, `GEMINI_API_KEY`, `SLACK_WEBHOOK_URL`.
 
 **Vercel (frontend):** Root Directory `frontend` · Framework Vite · Variable `VITE_API_URL` = URL de Render.

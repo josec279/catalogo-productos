@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { getProducts, createProduct } from './api'
 import { Product3DViewer } from './components/Product3DViewer'
 import { ProductForm } from './components/ProductForm'
+import { ChatAgent } from './components/ChatAgent'
 import { ProductGrid } from './components/ProductGrid'
 
 export default function App() {
@@ -51,6 +52,7 @@ export default function App() {
         <aside className="space-y-6">
           <Product3DViewer product={featured} />
           <ProductForm onCreate={handleCreate} />
+          <ChatAgent />
         </aside>
 
         <section>

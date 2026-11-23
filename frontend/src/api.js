@@ -7,6 +7,24 @@ export async function getProducts() {
   return res.json()
 }
 
+export async function askAgent(question) {
+  const res = await fetch(`${API_URL}/api/v1/chat`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ question }),
+  })
+  if (!res.ok) {
+    let detail = `Error ${res.status}`
+    try {
+      detail = (await res.json()).detail || detail
+    } catch {
+      /* respuesta sin JSON */
+    }
+    throw new Error(detail)
+  }
+  return (await res.json()).answer
+}
+
 export async function createProduct(product) {
   const res = await fetch(PRODUCTS, {
     method: 'POST',

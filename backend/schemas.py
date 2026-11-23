@@ -4,6 +4,14 @@ from typing import Optional
 from pydantic import BaseModel, ConfigDict, Field
 
 
+class ChatRequest(BaseModel):
+    question: str = Field(min_length=1, max_length=500)
+
+
+class ChatResponse(BaseModel):
+    answer: str
+
+
 # Base compartida
 class ProductBase(BaseModel):
     name: str = Field(min_length=1)

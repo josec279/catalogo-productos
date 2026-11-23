@@ -2,10 +2,11 @@ import os
 from typing import List
 
 import requests
-from fastapi import BackgroundTasks, Depends, FastAPI, status
+from fastapi import BackgroundTasks, Depends, FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
+import agent
 import models
 import schemas
 from database import engine, get_db
@@ -43,6 +44,18 @@ def notificar_slack(producto: schemas.ProductResponse) -> None:
         requests.post(SLACK_WEBHOOK_URL, json={"text": texto}, timeout=5)
     except requests.RequestException as e:
         print(f"[slack] No se pudo enviar la notificación: {e}")
+
+
+@app.post("/api/v1/chat", response_model=schemas.ChatResponse, tags=["Agente IA"])
+def chat(body: schemas.ChatRequest, db: Session = Depends(get_db)):
+    """Agente Gemini que responde preguntas consultando la base de datos."""
+    try:
+        return {"answer": agent.preguntar(body.question, db)}
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        print(f"[agent] error: {e}")
+        raise HTTPException(status_code=502, detail="El agente de IA no pudo responder, intenta de nuevo.")
 
 
 @app.get("/", tags=["Salud"])
