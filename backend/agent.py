@@ -13,12 +13,12 @@ from sqlalchemy.orm import Session
 import models
 
 # Modelo gratuito de Google AI Studio. Configurable por variable de entorno.
-GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.5-flash")
 
 SYSTEM_PROMPT = (
     "Eres el asistente de un catálogo de productos. Responde siempre en español, "
     "de forma breve y clara. Para responder sobre productos, precios o stock DEBES "
-    "usar las herramientas disponibles; no inventes datos. Si no hay resultados, dilo."
+    "usar las herramientas disponibles; no inventes datos. Muestra los precios en dólares con el símbolo $. Si no hay resultados, dilo."
 )
 
 
@@ -71,7 +71,7 @@ def preguntar(pregunta: str, db: Session) -> str:
     if not api_key:
         raise RuntimeError("Falta la variable de entorno GEMINI_API_KEY")
 
-    client = genai.Client(api_key=api_key)
+    client = genai.Client(api_key=api_key, http_options={"timeout": 30000})
     response = client.models.generate_content(
         model=GEMINI_MODEL,
         contents=pregunta,
