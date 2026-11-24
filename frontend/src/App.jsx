@@ -1,13 +1,11 @@
 import { useEffect, useState } from 'react'
 import { getProducts, createProduct } from './api'
-import { Product3DViewer } from './components/Product3DViewer'
 import { ProductForm } from './components/ProductForm'
 import { ChatAgent } from './components/ChatAgent'
 import { ProductGrid } from './components/ProductGrid'
 
 export default function App() {
   const [products, setProducts] = useState([])
-  const [selectedId, setSelectedId] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
@@ -30,10 +28,7 @@ export default function App() {
   async function handleCreate(product) {
     const created = await createProduct(product)
     setProducts((prev) => [created, ...prev])
-    setSelectedId(created.id)
   }
-
-  const featured = products.find((p) => p.id === selectedId) ?? products[0]
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100">
@@ -50,7 +45,6 @@ export default function App() {
 
       <main className="max-w-6xl mx-auto px-4 py-8 grid gap-8 lg:grid-cols-[360px_1fr]">
         <aside className="space-y-6">
-          <Product3DViewer product={featured} />
           <ProductForm onCreate={handleCreate} />
           <ChatAgent />
         </aside>
@@ -66,7 +60,7 @@ export default function App() {
             </p>
           )}
           {!loading && !error && (
-            <ProductGrid products={products} selectedId={featured?.id} onSelect={setSelectedId} />
+            <ProductGrid products={products} />
           )}
         </section>
       </main>

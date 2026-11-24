@@ -6,7 +6,7 @@ MVP de una sola tabla (`products`).
 |------|-----------|---------|
 | Base de datos | Supabase (PostgreSQL) | `backend/schema.sql` |
 | API | FastAPI en Render | `backend/` |
-| Frontend | React + Vite + Tailwind + React Three Fiber en Vercel | `frontend/` |
+| Frontend | React + Vite + Tailwind en Vercel | `frontend/` |
 | Agente IA | Gemini (Google AI Studio) con herramientas de solo lectura sobre la BD | `backend/agent.py` |
 
 ## Ejecutar en local
