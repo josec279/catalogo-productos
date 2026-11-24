@@ -2,6 +2,7 @@ from typing import List
 
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
+from google.genai import errors as genai_errors
 from sqlalchemy.orm import Session
 
 import agent
@@ -35,6 +36,14 @@ def chat(body: schemas.ChatRequest, db: Session = Depends(get_db)):
         return {"answer": agent.preguntar(body.question, db)}
     except RuntimeError as e:
         raise HTTPException(status_code=503, detail=str(e))
+    except genai_errors.APIError as e:
+        print(f"[agent] error de Gemini ({e.code}): {e}")
+        if e.code == 429:
+            raise HTTPException(
+                status_code=429,
+                detail="Se agotó la cuota diaria gratuita de la IA. Intenta más tarde.",
+            )
+        raise HTTPException(status_code=502, detail="El agente de IA no pudo responder, intenta de nuevo.")
     except Exception as e:
         print(f"[agent] error: {e}")
         raise HTTPException(status_code=502, detail="El agente de IA no pudo responder, intenta de nuevo.")

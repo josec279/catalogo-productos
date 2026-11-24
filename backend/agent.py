@@ -13,7 +13,7 @@ from sqlalchemy.orm import Session
 import models
 
 # Modelo gratuito de Google AI Studio. Configurable por variable de entorno.
-GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.5-flash")
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.5-flash-lite")
 
 SYSTEM_PROMPT = (
     "Eres el asistente de un catálogo de productos. Responde siempre en español, "
