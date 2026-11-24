@@ -7,6 +7,17 @@ const SUGGESTIONS = [
   'Dame un resumen del inventario',
 ]
 
+// Convierte **texto** en negrita (sin HTML crudo, solo elementos de React)
+function renderText(text) {
+  return text.split(/(\*\*[^*]+\*\*)/g).map((part, i) =>
+    part.startsWith('**') && part.endsWith('**') && part.length > 4 ? (
+      <strong key={i}>{part.slice(2, -2)}</strong>
+    ) : (
+      part
+    ),
+  )
+}
+
 export function ChatAgent() {
   const [messages, setMessages] = useState([
     { role: 'bot', text: 'Hola 👋 Soy el asistente del catálogo. Pregúntame sobre productos, precios o stock.' },
@@ -51,7 +62,7 @@ export function ChatAgent() {
                     : 'bg-slate-800 text-slate-100'
               }`}
             >
-              {m.text}
+              {renderText(m.text)}
             </span>
           </div>
         ))}
