@@ -1,8 +1,6 @@
-import os
 from typing import List
 
-import requests
-from fastapi import BackgroundTasks, Depends, FastAPI, HTTPException, status
+from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
@@ -13,8 +11,6 @@ from database import engine, get_db
 
 # Crea la tabla en Supabase automáticamente si aún no existe
 models.Base.metadata.create_all(bind=engine)
-
-SLACK_WEBHOOK_URL = os.getenv("SLACK_WEBHOOK_URL")
 
 app = FastAPI(
     title="API de Catálogo de Productos",
@@ -30,20 +26,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
-def notificar_slack(producto: schemas.ProductResponse) -> None:
-    """Envía un aviso al canal de Slack (si hay webhook configurado)."""
-    if not SLACK_WEBHOOK_URL:
-        return
-    texto = (
-        f":package: ¡Nuevo producto registrado en el inventario!\n"
-        f"*{producto.name}* — ${producto.price:.2f} — stock: {producto.stock}"
-    )
-    try:
-        requests.post(SLACK_WEBHOOK_URL, json={"text": texto}, timeout=5)
-    except requests.RequestException as e:
-        print(f"[slack] No se pudo enviar la notificación: {e}")
 
 
 @app.post("/api/v1/chat", response_model=schemas.ChatResponse, tags=["Agente IA"])
@@ -78,13 +60,10 @@ def list_products(db: Session = Depends(get_db)):
 )
 def create_product(
     product: schemas.ProductCreate,
-    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
 ):
     nuevo_producto = models.Product(**product.model_dump())
     db.add(nuevo_producto)
     db.commit()
     db.refresh(nuevo_producto)
-    respuesta = schemas.ProductResponse.model_validate(nuevo_producto)
-    background_tasks.add_task(notificar_slack, respuesta)
-    return respuesta
+    return nuevo_producto
